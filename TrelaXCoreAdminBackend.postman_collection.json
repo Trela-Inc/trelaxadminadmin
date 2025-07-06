@@ -1,0 +1,350 @@
+{
+  "info": {
+    "_postman_id": "trelaxcoreadminbackend-collection",
+    "name": "TrelaXCoreAdminBackend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API collection for TrelaXCoreAdminBackend. Uses {{base_url}} and {{jwt_token}} variables."
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "jwt_token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Application",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": { "method": "GET", "url": "{{base_url}}/", "description": "Health check endpoint" }
+        },
+        {
+          "name": "API Information",
+          "request": { "method": "GET", "url": "{{base_url}}/info", "description": "API information endpoint" }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}" },
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "description": "Authenticate admin and get JWT token"
+          }
+        },
+        {
+          "name": "Get Admin Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/auth/profile",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get current admin profile (JWT required)"
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/refresh",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Refresh JWT token (JWT required)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Files",
+      "item": [
+        {
+          "name": "Upload Single File",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/files/upload",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "multipart/form-data" }
+            ],
+            "body": { "mode": "formdata", "formdata": [ { "key": "file", "type": "file" } ] },
+            "description": "Upload a single file (JWT required)"
+          }
+        },
+        {
+          "name": "Upload Multiple Files",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/files/upload/multiple",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "multipart/form-data" }
+            ],
+            "body": { "mode": "formdata", "formdata": [ { "key": "files", "type": "file" } ] },
+            "description": "Upload multiple files (JWT required)"
+          }
+        },
+        {
+          "name": "List Files",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/files",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "List files (JWT required)"
+          }
+        },
+        {
+          "name": "Get File by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/files/:id",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get file by ID (JWT required)"
+          }
+        },
+        {
+          "name": "Download File by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/files/:id/download",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Download file by ID (JWT required)"
+          }
+        },
+        {
+          "name": "Delete File by ID",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/files/:id",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Delete file by ID (JWT required)"
+          }
+        },
+        {
+          "name": "File Statistics",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/files/admin/statistics",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "File statistics (JWT required)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Masters",
+      "item": [
+        {
+          "name": "Create Master Field",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/masters",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"fieldType\": \"\",\n  \"name\": \"\",\n  \"description\": \"\",\n  \"value\": \"\"\n}" },
+            "description": "Create master field (JWT required)"
+          }
+        },
+        {
+          "name": "List Master Fields",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/masters",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "List master fields (JWT required)"
+          }
+        },
+        {
+          "name": "Get Master Field by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/masters/:id",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get master field by ID (JWT required)"
+          }
+        },
+        {
+          "name": "Update Master Field",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/masters/:id",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"fieldType\": \"\",\n  \"name\": \"\",\n  \"description\": \"\",\n  \"value\": \"\"\n}" },
+            "description": "Update master field (JWT required)"
+          }
+        },
+        {
+          "name": "Delete Master Field",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/masters/:id",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Delete master field (JWT required)"
+          }
+        },
+        {
+          "name": "Get Cities",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/masters/cities",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get cities (JWT required)"
+          }
+        },
+        {
+          "name": "Get Locations by City",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/masters/locations/:cityId",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get locations by city (JWT required)"
+          }
+        },
+        {
+          "name": "Get Amenities",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/masters/amenities",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get amenities (JWT required)"
+          }
+        },
+        {
+          "name": "Get Bedrooms",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/masters/bedrooms",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get bedrooms (JWT required)"
+          }
+        },
+        {
+          "name": "Get Bathrooms",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/masters/bathrooms",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get bathrooms (JWT required)"
+          }
+        },
+        {
+          "name": "Master Statistics",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/masters/statistics",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Master statistics (JWT required)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create Project",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/projects",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"projectName\": \"\",\n  \"projectDescription\": \"\",\n  \"projectStatus\": \"\",\n  \"propertyType\": \"\",\n  \"location\": {},\n  \"builder\": {},\n  \"unitConfigurations\": []\n}" },
+            "description": "Create project (JWT required)"
+          }
+        },
+        {
+          "name": "List Projects",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "List projects (JWT required)"
+          }
+        },
+        {
+          "name": "Get Project by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/:id",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get project by ID (JWT required)"
+          }
+        },
+        {
+          "name": "Update Project by ID",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/projects/:id",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"projectName\": \"\",\n  \"projectDescription\": \"\",\n  \"projectStatus\": \"\",\n  \"propertyType\": \"\",\n  \"location\": {},\n  \"builder\": {},\n  \"unitConfigurations\": []\n}" },
+            "description": "Update project by ID (JWT required)"
+          }
+        },
+        {
+          "name": "Delete Project by ID",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/projects/:id",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Delete project by ID (JWT required)"
+          }
+        },
+        {
+          "name": "Upload Media to Project",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/projects/:id/media/:type",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "multipart/form-data" }
+            ],
+            "body": { "mode": "formdata", "formdata": [ { "key": "files", "type": "file" } ] },
+            "description": "Upload media to project (JWT required)"
+          }
+        },
+        {
+          "name": "Upload Documents to Project",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/projects/:id/documents/:type",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{jwt_token}}" },
+              { "key": "Content-Type", "value": "multipart/form-data" }
+            ],
+            "body": { "mode": "formdata", "formdata": [ { "key": "files", "type": "file" } ] },
+            "description": "Upload documents to project (JWT required)"
+          }
+        },
+        {
+          "name": "Project Statistics",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/admin/statistics",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Project statistics (JWT required)"
+          }
+        },
+        {
+          "name": "Get Featured Projects",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/projects/featured",
+            "header": [ { "key": "Authorization", "value": "Bearer {{jwt_token}}" } ],
+            "description": "Get featured projects (JWT required)"
+          }
+        }
+      ]
+    }
+  ]
+} 
