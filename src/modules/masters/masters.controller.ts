@@ -96,8 +96,8 @@ For locations, specify parentId to link to a city.
   })
   @ApiBadRequestResponse('Invalid input data or field already exists')
   @ApiUnauthorizedResponse('Invalid or missing JWT token')
-  async create(@Body() createMasterFieldDto: CreateMasterFieldDto, @Request() req) {
-    const field = await this.mastersService.create(createMasterFieldDto, req.user._id);
+  async create(@Body() createMasterFieldDto: CreateMasterFieldDto) {
+    const field = await this.mastersService.create(createMasterFieldDto);
     return ResponseUtil.created(field, 'Master field created successfully');
   }
 
@@ -140,14 +140,24 @@ For locations, specify parentId to link to a city.
   })
   @ApiUnauthorizedResponse('Invalid or missing JWT token')
   async findAll(@Query() queryDto: QueryMasterFieldDto) {
-    const result = await this.mastersService.findAll(queryDto);
-    return ResponseUtil.paginated(
-      result.fields,
-      result.pagination.page,
-      result.pagination.limit,
-      result.pagination.total,
-      'Master fields retrieved successfully'
-    );
+    try {
+      const result = await this.mastersService.findAll(queryDto);
+      return ResponseUtil.paginated(
+        result.fields,
+        result.pagination.page,
+        result.pagination.limit,
+        result.pagination.total,
+        'Master fields retrieved successfully'
+      );
+    } catch (error) {
+      console.error('Error in GET /masters:', error);
+      return ResponseUtil.error(
+        error.message || 'Internal server error',
+        error.stack || error.name,
+        error.status || 500,
+        '/api/v1/masters'
+      );
+    }
   }
 
   /**
@@ -186,10 +196,9 @@ For locations, specify parentId to link to a city.
   @ApiUnauthorizedResponse('Invalid or missing JWT token')
   async update(
     @Param('id') id: string,
-    @Body() updateMasterFieldDto: UpdateMasterFieldDto,
-    @Request() req
+    @Body() updateMasterFieldDto: UpdateMasterFieldDto
   ) {
-    const field = await this.mastersService.update(id, updateMasterFieldDto, req.user._id);
+    const field = await this.mastersService.update(id, updateMasterFieldDto);
     return ResponseUtil.success(field, 'Master field updated successfully');
   }
 

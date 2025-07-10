@@ -24,7 +24,7 @@ export class MastersService {
   /**
    * Create a new master field
    */
-  async create(createMasterFieldDto: CreateMasterFieldDto, userId: string): Promise<MasterField> {
+  async create(createMasterFieldDto: CreateMasterFieldDto): Promise<MasterField> {
     try {
       // Check if field already exists
       const existingField = await this.masterFieldModel.findOne({
@@ -39,7 +39,6 @@ export class MastersService {
       const masterField = new this.masterFieldModel({
         ...createMasterFieldDto,
         parentId: createMasterFieldDto.parentId ? new Types.ObjectId(createMasterFieldDto.parentId) : undefined,
-        createdBy: new Types.ObjectId(userId),
       });
 
       return await masterField.save();
@@ -55,7 +54,15 @@ export class MastersService {
    * Get all master fields with pagination and filtering
    */
   async findAll(queryDto: QueryMasterFieldDto) {
-    const { page, limit, search, fieldType, status, parentId, isDefault, sortBy, sortOrder } = queryDto;
+    let { page, limit, search, fieldType, status, parentId, isDefault, sortBy, sortOrder } = queryDto;
+
+    // Fallback defaults
+    if (!sortBy || !['name', 'createdAt', 'updatedAt', 'sortOrder'].includes(sortBy)) {
+      sortBy = 'sortOrder';
+    }
+    if (!sortOrder || !['asc', 'desc'].includes(sortOrder)) {
+      sortOrder = 'asc';
+    }
 
     // Build filter object
     const filter: any = {};
@@ -96,8 +103,6 @@ export class MastersService {
       this.masterFieldModel
         .find(filter)
         .populate('parentId', 'name fieldType')
-        .populate('createdBy', 'firstName lastName email')
-        .populate('updatedBy', 'firstName lastName email')
         .sort(sort)
         .skip(skip)
         .limit(limit)
@@ -126,8 +131,6 @@ export class MastersService {
       const field = await this.masterFieldModel
         .findById(id)
         .populate('parentId', 'name fieldType')
-        .populate('createdBy', 'firstName lastName email')
-        .populate('updatedBy', 'firstName lastName email')
         .exec();
 
       if (!field) {
@@ -146,19 +149,16 @@ export class MastersService {
   /**
    * Update master field
    */
-  async update(id: string, updateMasterFieldDto: UpdateMasterFieldDto, userId: string): Promise<MasterField> {
+  async update(id: string, updateMasterFieldDto: UpdateMasterFieldDto): Promise<MasterField> {
     try {
       const updateData = {
         ...updateMasterFieldDto,
         parentId: updateMasterFieldDto.parentId ? new Types.ObjectId(updateMasterFieldDto.parentId) : undefined,
-        updatedBy: new Types.ObjectId(userId),
       };
 
       const field = await this.masterFieldModel
         .findByIdAndUpdate(id, updateData, { new: true, runValidators: true })
         .populate('parentId', 'name fieldType')
-        .populate('createdBy', 'firstName lastName email')
-        .populate('updatedBy', 'firstName lastName email')
         .exec();
 
       if (!field) {
@@ -207,7 +207,12 @@ export class MastersService {
     };
 
     if (parentId) {
-      filter.parentId = new Types.ObjectId(parentId);
+      if (Types.ObjectId.isValid(parentId)) {
+        filter.parentId = new Types.ObjectId(parentId);
+      } else {
+        // Skip filtering by parentId if invalid
+        console.warn('Invalid parentId provided to getFieldsByType:', parentId);
+      }
     }
 
     return await this.masterFieldModel

@@ -9,7 +9,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { MastersModule } from './modules/masters/masters.module';
-
+import { FilesModule } from './modules/files/files.module';
 /**
  * Root application module that configures all global modules and dependencies
  * Includes MongoDB connection, JWT authentication, file upload configuration

@@ -71,20 +71,6 @@ export class MasterField {
   parentId?: Types.ObjectId;
 
   // System fields
-  @Prop({
-    type: Types.ObjectId,
-    ref: 'User',
-    required: true,
-    index: true,
-  })
-  createdBy: Types.ObjectId;
-
-  @Prop({
-    type: Types.ObjectId,
-    ref: 'User',
-    required: false,
-  })
-  updatedBy?: Types.ObjectId;
 
   // Timestamps
   createdAt?: Date;
