@@ -35,10 +35,21 @@ export class LocationDto {
   @IsNotEmpty()
   address: string;
 
-  @ApiProperty({ description: 'City name', example: 'Mumbai' })
+  @ApiProperty({
+    description: 'City ID from Masters module',
+    example: '507f1f77bcf86cd799439011'
+  })
   @IsString()
   @IsNotEmpty()
-  city: string;
+  cityId: string;
+
+  @ApiProperty({
+    description: 'Location ID from Masters module',
+    example: '507f1f77bcf86cd799439012'
+  })
+  @IsString()
+  @IsNotEmpty()
+  locationId: string;
 
   @ApiProperty({ description: 'State name', example: 'Maharashtra' })
   @IsString()
@@ -198,58 +209,18 @@ export class UnitConfigurationDto {
 }
 
 /**
- * Amenities DTO
+ * Amenities DTO - Using Master Field IDs
  */
 export class AmenitiesDto {
   @ApiPropertyOptional({
-    description: 'Basic amenities',
+    description: 'Array of amenity IDs from Masters module',
+    example: ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012', '507f1f77bcf86cd799439013'],
     type: [String],
-    example: ['Swimming Pool', 'Gym', 'Garden'],
   })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  basic?: string[];
-
-  @ApiPropertyOptional({
-    description: 'Security amenities',
-    type: [String],
-    example: ['CCTV', '24/7 Security', 'Intercom'],
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  security?: string[];
-
-  @ApiPropertyOptional({
-    description: 'Recreational amenities',
-    type: [String],
-    example: ['Club House', 'Children Play Area', 'Jogging Track'],
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  recreational?: string[];
-
-  @ApiPropertyOptional({
-    description: 'Convenience amenities',
-    type: [String],
-    example: ['Parking', 'Lift', 'Power Backup'],
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  convenience?: string[];
-
-  @ApiPropertyOptional({
-    description: 'Connectivity amenities',
-    type: [String],
-    example: ['Metro Station', 'Bus Stop', 'Highway Access'],
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  connectivity?: string[];
+  amenityIds?: string[];
 }
 
 /**
@@ -537,4 +508,33 @@ export class CreateProjectDto {
   @IsOptional()
   @IsBoolean()
   isFeatured?: boolean;
+
+  // File Upload Fields (these will be handled separately in the controller)
+  @ApiPropertyOptional({
+    description: 'Project images to upload',
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+  })
+  projectImages?: any[];
+
+  @ApiPropertyOptional({
+    description: 'Floor plan images to upload',
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+  })
+  floorPlanImages?: any[];
+
+  @ApiPropertyOptional({
+    description: 'Project brochure PDF to upload',
+    type: 'string',
+    format: 'binary',
+  })
+  brochurePdf?: any;
+
+  @ApiPropertyOptional({
+    description: 'Additional project documents to upload',
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+  })
+  additionalDocuments?: any[];
 }

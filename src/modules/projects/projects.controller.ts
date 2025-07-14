@@ -12,7 +12,7 @@ import {
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor, AnyFilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -34,6 +34,7 @@ import {
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
 } from '../../common/decorators/api-response.decorator';
+import { S3Service } from '../files/services/s3.service';
 
 /**
  * Projects controller
@@ -44,41 +45,45 @@ import {
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly projectsService: ProjectsService,
+    private readonly s3Service: S3Service,
+  ) {}
 
   /**
-   * Create a new project
+   * Create a new project with media upload
    */
   @Post()
+  @UseInterceptors(AnyFilesInterceptor())
+  @ApiConsumes('multipart/form-data')
   @ApiOperation({
-    summary: '🏗️ Create New Project',
+    summary: '🏗️ Create New Project (with media upload)',
     description: `
-**Create a new real estate project**
+**Create a new real estate project with file uploads**
 
-This endpoint allows you to create a comprehensive real estate project with:
-- Basic project information (name, description, builder)
-- Location details (city, address, coordinates)
-- Property specifications (type, units, pricing)
-- Amenities and features
-- RERA compliance details
+This endpoint accepts both project data and file uploads in a single request:
 
-**Required Fields:**
-- Project name and description
-- Builder information
-- Location (city, address)
-- Property type and status
-- At least one unit configuration
+**Form Fields:**
+- **projectData**: JSON string containing all project information
+- **projectImages**: Multiple image files (JPG, PNG, WebP)
+- **floorPlanImages**: Multiple floor plan images
+- **brochurePdf**: Single PDF brochure file
+- **additionalDocuments**: Multiple document files (PDF, DOC, etc.)
 
-**Optional Fields:**
-- Media files (images, videos)
-- Documents (brochures, floor plans)
-- Amenities list
-- Pricing information
-- RERA number
+**File Storage:**
+- All files are uploaded to AWS S3
+- Organized in folders: /projects/images/, /projects/floorplans/, /projects/brochures/, /projects/documents/
+- URLs are automatically included in the project response
+
+**Example Form Data:**
+- projectData: '{"projectName": "Test Project", "projectDescription": "...", ...}'
+- projectImages: [file1.jpg, file2.jpg]
+- floorPlanImages: [floorplan1.jpg]
+- brochurePdf: brochure.pdf
     `,
   })
   @ApiCreatedResponse({
-    description: 'Project created successfully',
+    description: 'Project created successfully with uploaded files',
     schema: {
       type: 'object',
       properties: {
@@ -87,27 +92,127 @@ This endpoint allows you to create a comprehensive real estate project with:
         data: {
           type: 'object',
           properties: {
-            id: { type: 'string' },
-            projectName: { type: 'string' },
-            projectDescription: { type: 'string' },
-            projectStatus: { type: 'string' },
-            propertyType: { type: 'string' },
-            location: { type: 'object' },
-            builder: { type: 'object' },
-            unitConfigurations: { type: 'array' },
-            createdAt: { type: 'string' },
-            updatedAt: { type: 'string' },
-          },
+            id: { type: 'string', example: '507f1f77bcf86cd799439011' },
+            projectName: { type: 'string', example: 'Luxury Heights Residency' },
+            projectStatus: { type: 'string', example: 'under_construction' },
+            media: {
+              type: 'object',
+              properties: {
+                images: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  example: ['https://s3.amazonaws.com/bucket/projects/images/image1.jpg']
+                },
+                floorPlans: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  example: ['https://s3.amazonaws.com/bucket/projects/floorplans/plan1.jpg']
+                },
+                brochures: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  example: ['https://s3.amazonaws.com/bucket/projects/brochures/brochure.pdf']
+                }
+              }
+            },
+            createdAt: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+          }
         },
-        timestamp: { type: 'string' },
-      },
-    },
+        timestamp: { type: 'string', example: '2024-01-01T00:00:00.000Z' }
+      }
+    }
   })
-  @ApiBadRequestResponse('Invalid input data or project already exists')
+  @ApiBadRequestResponse('Invalid project data or file upload failed')
   @ApiUnauthorizedResponse('Invalid or missing JWT token')
-  async create(@Body() createProjectDto: CreateProjectDto, @Request() req) {
-    const project = await this.projectsService.create(createProjectDto, req.user._id);
-    return ResponseUtil.created(project, 'Project created successfully');
+  async create(
+    @Body() body: any,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Request() req: any
+  ) {
+    try {
+      // Parse project data from form field
+      let createProjectDto: CreateProjectDto;
+
+      if (body.projectData) {
+        // If projectData is sent as a form field
+        createProjectDto = typeof body.projectData === 'string'
+          ? JSON.parse(body.projectData)
+          : body.projectData;
+      } else {
+        // If sent as regular form fields
+        createProjectDto = body;
+      }
+
+      // Initialize media object
+      const media: any = {
+        images: [],
+        floorPlans: [],
+        brochures: [],
+        videos: [],
+        masterPlan: [],
+        locationMap: []
+      };
+
+      const documents: any = {
+        approvals: [],
+        legalDocuments: [],
+        certificates: [],
+        others: []
+      };
+
+      // Process uploaded files
+      if (files && files.length > 0) {
+        for (const file of files) {
+          const fieldName = file.fieldname;
+          let s3Folder = 'projects/misc';
+          let targetArray = documents.others;
+
+          // Determine S3 folder and target array based on field name
+          switch (fieldName) {
+            case 'projectImages':
+              s3Folder = 'projects/images';
+              targetArray = media.images;
+              break;
+            case 'floorPlanImages':
+              s3Folder = 'projects/floorplans';
+              targetArray = media.floorPlans;
+              break;
+            case 'brochurePdf':
+              s3Folder = 'projects/brochures';
+              targetArray = media.brochures;
+              break;
+            case 'additionalDocuments':
+              s3Folder = 'projects/documents';
+              targetArray = documents.others;
+              break;
+            default:
+              s3Folder = 'projects/misc';
+              targetArray = documents.others;
+          }
+
+          // Upload file to S3
+          const uploadResult = await this.s3Service.uploadFile(file, s3Folder);
+          targetArray.push(uploadResult.url);
+        }
+      }
+
+      // Add media and documents to project data if files were uploaded
+      if (media.images.length > 0 || media.floorPlans.length > 0 || media.brochures.length > 0) {
+        createProjectDto.media = { ...createProjectDto.media, ...media };
+      }
+
+      if (documents.others.length > 0) {
+        createProjectDto.documents = { ...createProjectDto.documents, ...documents };
+      }
+
+      // Create project
+      const project = await this.projectsService.create(createProjectDto, req.user.id);
+      return ResponseUtil.created(project, 'Project created successfully');
+
+    } catch (error) {
+      console.error('Error creating project:', error);
+      throw error;
+    }
   }
 
   /**

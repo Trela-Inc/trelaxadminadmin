@@ -32,7 +32,7 @@ export class ProjectsService {
       if (existingProject) {
         throw new ConflictException('Project with this name already exists');
       }
-
+  
       // Create new project
       const createdProject = new this.projectModel({
         ...createProjectDto,
@@ -187,10 +187,15 @@ export class ProjectsService {
       // Calculate pagination
       const skip = (page - 1) * limit;
 
-      // Execute queries
+      // Execute queries with population
       const [projects, total] = await Promise.all([
         this.projectModel
           .find(filter)
+          .populate('location.cityId', 'name fieldType')
+          .populate('location.locationId', 'name fieldType')
+          .populate('amenities.amenityIds', 'name fieldType description')
+          .populate('createdBy', 'firstName lastName email')
+          .populate('updatedBy', 'firstName lastName email')
           .sort(sort)
           .skip(skip)
           .limit(limit)
@@ -222,6 +227,11 @@ export class ProjectsService {
     try {
       const project = await this.projectModel
         .findById(id)
+        .populate('location.cityId', 'name fieldType')
+        .populate('location.locationId', 'name fieldType')
+        .populate('amenities.amenityIds', 'name fieldType description')
+        .populate('createdBy', 'firstName lastName email')
+        .populate('updatedBy', 'firstName lastName email')
         .exec();
 
       if (!project) {

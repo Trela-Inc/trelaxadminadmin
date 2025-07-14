@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Project Upload - TrelaX API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .file-input {
+            border: 2px dashed #3498db;
+            padding: 20px;
+            text-align: center;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+        }
+        .file-input input[type="file"] {
+            border: none;
+            background: none;
+            padding: 0;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .token-input {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 TrelaX Project Upload Test</h1>
+        
+        <div class="token-input">
+            <label for="jwtToken">JWT Token (Get from /auth/login):</label>
+            <input type="text" id="jwtToken" placeholder="Paste your JWT token here..." />
+        </div>
+
+        <form id="projectForm">
+            <div class="form-group">
+                <label for="projectName">Project Name *</label>
+                <input type="text" id="projectName" value="Test Luxury Project" required />
+            </div>
+
+            <div class="form-group">
+                <label for="projectDescription">Project Description *</label>
+                <textarea id="projectDescription" required>Premium residential project with modern amenities and world-class facilities</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="builderName">Builder Name *</label>
+                <input type="text" id="builderName" value="ABC Constructions" required />
+            </div>
+
+            <div class="form-group">
+                <label for="city">City *</label>
+                <input type="text" id="city" value="Mumbai" required />
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address *</label>
+                <input type="text" id="address" value="123 Main Street, Bandra West" required />
+            </div>
+
+            <div class="form-group">
+                <label>Project Images (Optional)</label>
+                <div class="file-input">
+                    <input type="file" id="projectImages" multiple accept="image/*" />
+                    <p>Select multiple project images (JPG, PNG, WebP)</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Floor Plan Images (Optional)</label>
+                <div class="file-input">
+                    <input type="file" id="floorPlanImages" multiple accept="image/*" />
+                    <p>Select floor plan images</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Brochure PDF (Optional)</label>
+                <div class="file-input">
+                    <input type="file" id="brochurePdf" accept=".pdf" />
+                    <p>Select project brochure (PDF only)</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Additional Documents (Optional)</label>
+                <div class="file-input">
+                    <input type="file" id="additionalDocuments" multiple accept=".pdf,.doc,.docx" />
+                    <p>Select additional documents (PDF, DOC, DOCX)</p>
+                </div>
+            </div>
+
+            <button type="submit">🚀 Create Project with Files</button>
+        </form>
+
+        <div id="response"></div>
+    </div>
+
+    <script>
+        document.getElementById('projectForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const token = document.getElementById('jwtToken').value;
+            if (!token) {
+                showResponse('Please enter JWT token first!', 'error');
+                return;
+            }
+
+            // Create project data object
+            const projectData = {
+                projectName: document.getElementById('projectName').value,
+                projectDescription: document.getElementById('projectDescription').value,
+                builder: {
+                    name: document.getElementById('builderName').value,
+                    description: "Leading real estate developer",
+                    contactEmail: "info@builder.com",
+                    contactPhone: "+91-9876543210"
+                },
+                projectStatus: "under_construction",
+                location: {
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    state: "Maharashtra",
+                    country: "India",
+                    pincode: "400001",
+                    coordinates: [72.8777, 19.0760]
+                },
+                propertyType: "residential",
+                unitConfigurations: [
+                    {
+                        type: "apartment",
+                        name: "2 BHK",
+                        bedrooms: 2,
+                        bathrooms: 2,
+                        carpetArea: 1000,
+                        priceMin: 5000000,
+                        priceMax: 8000000
+                    }
+                ],
+                amenities: {
+                    basic: ["Swimming Pool", "Gymnasium", "Garden"],
+                    security: ["CCTV Surveillance", "24/7 Security"]
+                },
+                isFeatured: true
+            };
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('projectData', JSON.stringify(projectData));
+
+            // Add files
+            const projectImages = document.getElementById('projectImages').files;
+            for (let i = 0; i < projectImages.length; i++) {
+                formData.append('projectImages', projectImages[i]);
+            }
+
+            const floorPlanImages = document.getElementById('floorPlanImages').files;
+            for (let i = 0; i < floorPlanImages.length; i++) {
+                formData.append('floorPlanImages', floorPlanImages[i]);
+            }
+
+            const brochurePdf = document.getElementById('brochurePdf').files[0];
+            if (brochurePdf) {
+                formData.append('brochurePdf', brochurePdf);
+            }
+
+            const additionalDocuments = document.getElementById('additionalDocuments').files;
+            for (let i = 0; i < additionalDocuments.length; i++) {
+                formData.append('additionalDocuments', additionalDocuments[i]);
+            }
+
+            try {
+                showResponse('Uploading project and files...', 'success');
+                
+                const response = await fetch('http://localhost:3000/api/v1/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showResponse(`✅ SUCCESS!\n\n${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    showResponse(`❌ ERROR!\n\n${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResponse(`❌ NETWORK ERROR!\n\n${error.message}`, 'error');
+            }
+        });
+
+        function showResponse(message, type) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.textContent = message;
+            responseDiv.className = `response ${type}`;
+        }
+
+        // Auto-fill JWT token from localStorage if available
+        window.addEventListener('load', function() {
+            const savedToken = localStorage.getItem('trelax_jwt_token');
+            if (savedToken) {
+                document.getElementById('jwtToken').value = savedToken;
+            }
+        });
+
+        // Save JWT token to localStorage when entered
+        document.getElementById('jwtToken').addEventListener('input', function() {
+            localStorage.setItem('trelax_jwt_token', this.value);
+        });
+    </script>
+</body>
+</html>

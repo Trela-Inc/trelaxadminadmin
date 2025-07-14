@@ -15,15 +15,28 @@ import {
 export type ProjectDocument = Project & Document;
 
 /**
- * Location sub-schema
+ * Location sub-schema - Using Master Field References
  */
 @Schema({ _id: false })
 export class Location {
   @Prop({ required: true, trim: true })
   address: string;
 
-  @Prop({ required: true, trim: true })
-  city: string;
+  @Prop({
+    required: true,
+    type: Types.ObjectId,
+    ref: 'MasterField',
+    index: true
+  })
+  cityId: Types.ObjectId;
+
+  @Prop({
+    required: true,
+    type: Types.ObjectId,
+    ref: 'MasterField',
+    index: true
+  })
+  locationId: Types.ObjectId;
 
   @Prop({ required: true, trim: true })
   state: string;
@@ -114,24 +127,17 @@ export class UnitConfiguration {
 }
 
 /**
- * Amenities sub-schema
+ * Amenities sub-schema - Using Master Field References
  */
 @Schema({ _id: false })
 export class Amenities {
-  @Prop({ required: false, type: [String], default: [] })
-  basic?: string[]; // Swimming Pool, Gym, etc.
-
-  @Prop({ required: false, type: [String], default: [] })
-  security?: string[]; // CCTV, Security Guard, etc.
-
-  @Prop({ required: false, type: [String], default: [] })
-  recreational?: string[]; // Club House, Garden, etc.
-
-  @Prop({ required: false, type: [String], default: [] })
-  convenience?: string[]; // Parking, Lift, etc.
-
-  @Prop({ required: false, type: [String], default: [] })
-  connectivity?: string[]; // Metro, Bus Stop, etc.
+  @Prop({
+    required: false,
+    type: [Types.ObjectId],
+    ref: 'MasterField',
+    default: []
+  })
+  amenityIds?: Types.ObjectId[]; // References to amenity master fields
 }
 
 /**

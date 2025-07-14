@@ -10,6 +10,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { MastersModule } from './modules/masters/masters.module';
 import { FilesModule } from './modules/files/files.module';
+import { BuildersModule } from './modules/builders/builders.module';
+import { AgentsModule } from './modules/agents/agents.module';
 /**
  * Root application module that configures all global modules and dependencies
  * Includes MongoDB connection, JWT authentication, file upload configuration
@@ -112,6 +114,8 @@ import { FilesModule } from './modules/files/files.module';
     // File upload and management module
     ProjectsModule, // Real estate projects management module
     MastersModule, // Master data management module (cities, locations, amenities, builders)
+    BuildersModule,
+    AgentsModule, // Real estate agents management module
   ],
   controllers: [AppController],
   providers: [AppService],
