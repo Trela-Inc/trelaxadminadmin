@@ -168,14 +168,19 @@ export abstract class BaseMasterService<T extends BaseMaster> {
    */
   async findById(id: string): Promise<T> {
     try {
-      const entry = await this.model
-        .findOne({ 
-          _id: id, 
-          masterType: this.masterType,
-          status: { $ne: MasterStatus.ARCHIVED }
-        })
-        .populate('parentId', 'name masterType')
-        .exec();
+      let query = this.model.findOne({
+        _id: id,
+        masterType: this.masterType,
+        status: { $ne: MasterStatus.ARCHIVED }
+      });
+
+      // Only populate parentId if the schema has this field
+      // Cities don't have parentId, but locations do
+      if (this.masterType !== MasterType.CITY) {
+        query = query.populate('parentId', 'name masterType');
+      }
+
+      const entry = await query.exec();
 
       if (!entry) {
         throw new NotFoundException(`${this.masterType} with ID ${id} not found`);
@@ -230,10 +235,15 @@ export abstract class BaseMasterService<T extends BaseMaster> {
         }
       }
 
-      const updatedEntry = await this.model
-        .findByIdAndUpdate(id, updateDto as any, { new: true, runValidators: true })
-        .populate('parentId', 'name masterType')
-        .exec();
+      let updateQuery = this.model
+        .findByIdAndUpdate(id, updateDto as any, { new: true, runValidators: true });
+
+      // Only populate parentId if the schema has this field
+      if (this.masterType !== MasterType.CITY) {
+        updateQuery = updateQuery.populate('parentId', 'name masterType');
+      }
+
+      const updatedEntry = await updateQuery.exec();
 
       return updatedEntry as unknown as T;
     } catch (error) {

@@ -25,7 +25,7 @@ export class Location {
   @Prop({
     required: true,
     type: Types.ObjectId,
-    ref: 'MasterField',
+    ref: 'City',
     index: true
   })
   cityId: Types.ObjectId;
@@ -33,7 +33,7 @@ export class Location {
   @Prop({
     required: true,
     type: Types.ObjectId,
-    ref: 'MasterField',
+    ref: 'Location',
     index: true
   })
   locationId: Types.ObjectId;
@@ -134,7 +134,7 @@ export class Amenities {
   @Prop({
     required: false,
     type: [Types.ObjectId],
-    ref: 'MasterField',
+    ref: 'Amenity',
     default: []
   })
   amenityIds?: Types.ObjectId[]; // References to amenity master fields

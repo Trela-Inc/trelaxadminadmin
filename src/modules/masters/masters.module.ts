@@ -7,6 +7,7 @@ import { TowersModule } from './towers/towers.module';
 import { PropertyTypesModule } from './property-types/property-types.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { WashroomsModule } from './washrooms/washrooms.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { WashroomsModule } from './washrooms/washrooms.module';
     PropertyTypesModule,
     RoomsModule,
     WashroomsModule,
+    UploadsModule,
   ],
   exports: [
     CitiesModule,
@@ -28,6 +30,7 @@ import { WashroomsModule } from './washrooms/washrooms.module';
     PropertyTypesModule,
     RoomsModule,
     WashroomsModule,
+    UploadsModule,
   ],
 })
-export class MastersModule {} 
+export class MastersModule {}

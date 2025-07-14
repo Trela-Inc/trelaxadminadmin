@@ -25,7 +25,15 @@ export class CitiesService extends BaseMasterService<City> {
    * Create a new city
    */
   async createCity(createCityDto: CreateCityDto): Promise<City> {
-    return await this.create(createCityDto);
+    // Prepare city data with defaults
+    const cityData: any = {
+      ...createCityDto,
+      masterType: MasterType.CITY,
+      country: createCityDto.country || 'India',
+      status: 'active'
+    };
+
+    return await this.create(cityData);
   }
 
   /**

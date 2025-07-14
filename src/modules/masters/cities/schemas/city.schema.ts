@@ -35,22 +35,22 @@ export class City extends MasterWithLocation {
   // - pinCodes?: string[]
 
   // City-specific fields
-  @Prop({ 
-    required: true, 
-    trim: true, 
+  @Prop({
+    required: false,
+    trim: true,
     maxlength: 100,
-    index: true 
+    index: true
   })
-  state: string;
+  state?: string;
 
-  @Prop({ 
-    required: true, 
-    trim: true, 
+  @Prop({
+    required: false,
+    trim: true,
     maxlength: 100,
     index: true,
     default: 'India'
   })
-  country: string;
+  country?: string;
 
   @Prop({
     required: true,

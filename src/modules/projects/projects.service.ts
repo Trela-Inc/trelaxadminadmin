@@ -187,15 +187,35 @@ export class ProjectsService {
       // Calculate pagination
       const skip = (page - 1) * limit;
 
-      // Execute queries with population
+      // Execute queries with optional population (for backward compatibility)
       const [projects, total] = await Promise.all([
         this.projectModel
           .find(filter)
-          .populate('location.cityId', 'name fieldType')
-          .populate('location.locationId', 'name fieldType')
-          .populate('amenities.amenityIds', 'name fieldType description')
-          .populate('createdBy', 'firstName lastName email')
-          .populate('updatedBy', 'firstName lastName email')
+          .populate({
+            path: 'location.cityId',
+            select: 'name masterType status',
+            options: { strictPopulate: false }
+          })
+          .populate({
+            path: 'location.locationId',
+            select: 'name masterType status',
+            options: { strictPopulate: false }
+          })
+          .populate({
+            path: 'amenities.amenityIds',
+            select: 'name masterType status description category',
+            options: { strictPopulate: false }
+          })
+          .populate({
+            path: 'createdBy',
+            select: 'firstName lastName email',
+            options: { strictPopulate: false }
+          })
+          .populate({
+            path: 'updatedBy',
+            select: 'firstName lastName email',
+            options: { strictPopulate: false }
+          })
           .sort(sort)
           .skip(skip)
           .limit(limit)
@@ -227,11 +247,31 @@ export class ProjectsService {
     try {
       const project = await this.projectModel
         .findById(id)
-        .populate('location.cityId', 'name fieldType')
-        .populate('location.locationId', 'name fieldType')
-        .populate('amenities.amenityIds', 'name fieldType description')
-        .populate('createdBy', 'firstName lastName email')
-        .populate('updatedBy', 'firstName lastName email')
+        .populate({
+          path: 'location.cityId',
+          select: 'name masterType status',
+          options: { strictPopulate: false }
+        })
+        .populate({
+          path: 'location.locationId',
+          select: 'name masterType status',
+          options: { strictPopulate: false }
+        })
+        .populate({
+          path: 'amenities.amenityIds',
+          select: 'name masterType status description category',
+          options: { strictPopulate: false }
+        })
+        .populate({
+          path: 'createdBy',
+          select: 'firstName lastName email',
+          options: { strictPopulate: false }
+        })
+        .populate({
+          path: 'updatedBy',
+          select: 'firstName lastName email',
+          options: { strictPopulate: false }
+        })
         .exec();
 
       if (!project) {

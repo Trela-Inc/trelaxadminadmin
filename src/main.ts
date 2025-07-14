@@ -50,11 +50,38 @@ async function bootstrap() {
 # 🚀 Complete Real Estate Management Backend
 
 ## 📋 Overview
-This API provides comprehensive backend services for real estate management including:
-- **Admin Authentication** - Secure JWT-based authentication for admin users
-- **Project Management** - Complete CRUD operations for real estate projects
-- **Master Data Management** - Centralized management of form dropdown fields
-- **File Management** - AWS S3 integration for media and document uploads
+This comprehensive API provides complete backend services for real estate management including:
+
+### 🔐 **Authentication Module**
+- **JWT-based Authentication** - Secure admin authentication system
+- **Role-based Access Control** - Admin, Super Admin, Manager roles
+- **Token Management** - Access tokens with refresh capability
+
+### 🏢 **Projects Management**
+- **Complete CRUD Operations** - Create, read, update, delete projects
+- **Media Upload Integration** - Images, videos, floor plans, brochures
+- **Document Management** - RERA certificates, approvals, legal documents
+- **Advanced Filtering** - Search by location, price, amenities, status
+- **Statistics & Analytics** - Project performance metrics
+
+### 🎛️ **Master Data Management**
+- **Cities Management** - Hierarchical city and state data
+- **Locations Management** - Area-wise location mapping
+- **Amenities Management** - Categorized amenity options
+- **Property Configuration** - Floors, towers, rooms, washrooms
+- **Property Types** - Residential, commercial classifications
+- **Document Templates** - Standardized document types
+
+### 🏗️ **Builders & Agents**
+- **Builder Profiles** - Complete builder information management
+- **Agent Management** - Real estate agent data and profiles
+- **Contact Management** - Centralized contact information
+
+### 📁 **File Management**
+- **AWS S3 Integration** - Secure cloud file storage
+- **Multiple File Types** - Images, documents, videos support
+- **File Organization** - Categorized file management
+- **Download & Streaming** - Optimized file delivery
 
 ## 🔐 Authentication
 All endpoints (except login) require JWT authentication. Include the token in the Authorization header:
@@ -75,14 +102,25 @@ All responses follow a standard format:
   "success": true,
   "message": "Operation completed successfully",
   "data": { ... },
+  "pagination": { "page": 1, "limit": 10, "total": 100 }, // For paginated responses
   "timestamp": "2024-01-01T00:00:00.000Z"
 }
 \`\`\`
 
+## 🎯 Key Features
+- **📱 RESTful API Design** - Standard HTTP methods and status codes
+- **🔍 Advanced Search & Filtering** - Comprehensive query capabilities
+- **📄 Pagination Support** - Efficient data loading for large datasets
+- **📊 Real-time Statistics** - Analytics and reporting endpoints
+- **🔒 Secure File Upload** - AWS S3 integration with validation
+- **📝 Comprehensive Validation** - Input validation and error handling
+- **🚀 High Performance** - Optimized database queries and caching
+
 ## 🚀 Quick Start
-1. Login with admin credentials to get JWT token
-2. Use the token in Authorization header for all other requests
-3. Explore the interactive API documentation below
+1. **Login** with admin credentials to get JWT token
+2. **Authorize** using the token in the Authorization header
+3. **Explore** the interactive API documentation below
+4. **Test** endpoints directly from this interface
     `)
     .setVersion('1.0.0')
     .setContact('TrelaX Support', 'https://trelax.com', 'support@trelax.com')
@@ -163,33 +201,70 @@ All responses follow a standard format:
   console.log(`GET    /${apiPrefix}/projects/:id`);
   console.log(`PATCH  /${apiPrefix}/projects/:id`);
   console.log(`DELETE /${apiPrefix}/projects/:id`);
-  console.log(`POST   /${apiPrefix}/projects/:id/media`);
-  console.log(`DELETE /${apiPrefix}/projects/:id/media/:mediaId`);
-  console.log(`POST   /${apiPrefix}/projects/:id/documents`);
-  console.log(`DELETE /${apiPrefix}/projects/:id/documents/:documentId`);
-  console.log(`GET    /${apiPrefix}/projects/search/location`);
+  console.log(`POST   /${apiPrefix}/projects/:id/media/:type`);
+  console.log(`POST   /${apiPrefix}/projects/:id/documents/:type`);
+  console.log(`GET    /${apiPrefix}/projects/admin/statistics`);
   console.log(`GET    /${apiPrefix}/projects/featured`);
-  console.log(`GET    /${apiPrefix}/projects/statistics`);
 
   console.log('\n🎛️ MASTERS ROUTES:');
-  console.log(`POST   /${apiPrefix}/masters`);
-  console.log(`GET    /${apiPrefix}/masters`);
-  console.log(`GET    /${apiPrefix}/masters/:id`);
-  console.log(`PATCH  /${apiPrefix}/masters/:id`);
-  console.log(`DELETE /${apiPrefix}/masters/:id`);
-  console.log(`GET    /${apiPrefix}/masters/cities`);
-  console.log(`GET    /${apiPrefix}/masters/locations/:cityId`);
-  console.log(`GET    /${apiPrefix}/masters/amenities`);
-  console.log(`GET    /${apiPrefix}/masters/bedrooms`);
-  console.log(`GET    /${apiPrefix}/masters/bathrooms`);
-  console.log(`GET    /${apiPrefix}/masters/statistics`);
+  console.log('\n   🏙️ Cities:');
+  console.log(`   POST   /${apiPrefix}/masters/cities`);
+  console.log(`   GET    /${apiPrefix}/masters/cities`);
+  console.log(`   GET    /${apiPrefix}/masters/cities/:id`);
+  console.log(`   PATCH  /${apiPrefix}/masters/cities/:id`);
+  console.log(`   DELETE /${apiPrefix}/masters/cities/:id`);
+  console.log(`   GET    /${apiPrefix}/masters/cities/statistics`);
+  console.log(`   GET    /${apiPrefix}/masters/cities/popular`);
+
+  console.log('\n   📍 Locations:');
+  console.log(`   POST   /${apiPrefix}/masters/locations`);
+  console.log(`   GET    /${apiPrefix}/masters/locations`);
+  console.log(`   GET    /${apiPrefix}/masters/locations/:id`);
+  console.log(`   PATCH  /${apiPrefix}/masters/locations/:id`);
+  console.log(`   DELETE /${apiPrefix}/masters/locations/:id`);
+  console.log(`   GET    /${apiPrefix}/masters/locations/by-city/:cityId`);
+
+  console.log('\n   🏊 Amenities:');
+  console.log(`   POST   /${apiPrefix}/masters/amenities`);
+  console.log(`   GET    /${apiPrefix}/masters/amenities`);
+  console.log(`   GET    /${apiPrefix}/masters/amenities/:id`);
+  console.log(`   PATCH  /${apiPrefix}/masters/amenities/:id`);
+  console.log(`   DELETE /${apiPrefix}/masters/amenities/:id`);
+  console.log(`   GET    /${apiPrefix}/masters/amenities/category/:category`);
+
+  console.log('\n   🏢 Property Configuration:');
+  console.log(`   GET    /${apiPrefix}/masters/floors`);
+  console.log(`   GET    /${apiPrefix}/masters/towers`);
+  console.log(`   GET    /${apiPrefix}/masters/property-types`);
+  console.log(`   GET    /${apiPrefix}/masters/rooms`);
+  console.log(`   GET    /${apiPrefix}/masters/washrooms`);
+
+  console.log('\n🏗️ BUILDERS ROUTES:');
+  console.log(`POST   /${apiPrefix}/builders`);
+  console.log(`GET    /${apiPrefix}/builders`);
+  console.log(`GET    /${apiPrefix}/builders/:id`);
+  console.log(`PATCH  /${apiPrefix}/builders/:id`);
+  console.log(`DELETE /${apiPrefix}/builders/:id`);
+
+  console.log('\n👥 AGENTS ROUTES:');
+  console.log(`POST   /${apiPrefix}/agents`);
+  console.log(`GET    /${apiPrefix}/agents`);
+  console.log(`GET    /${apiPrefix}/agents/:id`);
+  console.log(`PATCH  /${apiPrefix}/agents/:id`);
+  console.log(`DELETE /${apiPrefix}/agents/:id`);
 
   console.log('\n📁 FILES ROUTES:');
   console.log(`POST   /${apiPrefix}/files/upload`);
   console.log(`GET    /${apiPrefix}/files/:id`);
   console.log(`DELETE /${apiPrefix}/files/:id`);
   console.log(`GET    /${apiPrefix}/files/:id/download`);
-  console.log(`GET    /${apiPrefix}/files/user/:userId`);
+
+  console.log('\n📄 DOCUMENT UPLOADS:');
+  console.log(`POST   /${apiPrefix}/masters/uploads`);
+  console.log(`POST   /${apiPrefix}/masters/uploads/multiple`);
+  console.log(`GET    /${apiPrefix}/masters/uploads`);
+  console.log(`GET    /${apiPrefix}/masters/uploads/:id`);
+  console.log(`DELETE /${apiPrefix}/masters/uploads/:id`);
 
   console.log('\n===============================================');
   console.log('🔑 DEFAULT ADMIN CREDENTIALS:');
