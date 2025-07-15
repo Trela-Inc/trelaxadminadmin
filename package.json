@@ -18,7 +18,14 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "dev": "nest start --watch"
+    "test:e2e:watch": "jest --config ./test/jest-e2e.json --watch",
+    "test:e2e:coverage": "jest --config ./test/jest-e2e.json --coverage",
+    "test:e2e:runner": "ts-node test/run-tests.ts",
+    "test:e2e:list": "ts-node test/run-tests.ts --list",
+    "test:e2e:single": "ts-node test/run-tests.ts --test",
+    "dev": "nest start --watch",
+    "seed": "ts-node -r tsconfig-paths/register src/database/seeders/seed.command.ts",
+    "seed:prod": "node dist/database/seeders/seed.command.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.842.0",
@@ -46,6 +53,7 @@
     "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.9.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",

@@ -40,11 +40,11 @@ export class Location extends MasterWithParent {
   })
   masterType: MasterType.LOCATION;
 
-  @Prop({ 
-    required: true, 
+  @Prop({
+    required: true,
     type: Types.ObjectId,
-    ref: 'City',
-    index: true 
+    ref: 'City'
+    // Removed index: true as it's already defined in schema.index()
   })
   parentId: Types.ObjectId; // Reference to City
 
@@ -65,11 +65,11 @@ export class Location extends MasterWithParent {
   })
   locationCode?: string; // Unique location code within the city
 
-  @Prop({ 
-    required: false, 
-    type: [Number], 
-    validate: [arrayLimit, 'Coordinates must have exactly 2 elements'],
-    index: '2dsphere' 
+  @Prop({
+    required: false,
+    type: [Number],
+    validate: [arrayLimit, 'Coordinates must have exactly 2 elements']
+    // Removed index: '2dsphere' as it's already defined in schema.index()
   })
   coordinates?: [number, number]; // [longitude, latitude]
 

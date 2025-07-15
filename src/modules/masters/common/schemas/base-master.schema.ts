@@ -12,36 +12,36 @@ import { MasterStatus, MasterType } from '../enums/master-types.enum';
   collection: 'masters'
 })
 export class BaseMaster {
-  @Prop({ 
-    required: true, 
-    trim: true, 
-    maxlength: 100,
-    index: true 
+  @Prop({
+    required: true,
+    trim: true,
+    maxlength: 100
+    // Removed index: true as it should be defined in schema.index()
   })
   name: string;
 
-  @Prop({ 
-    required: false, 
-    trim: true, 
-    maxlength: 500 
+  @Prop({
+    required: false,
+    trim: true,
+    maxlength: 500
   })
   description?: string;
 
-  @Prop({ 
-    required: false, 
-    trim: true, 
+  @Prop({
+    required: false,
+    trim: true,
     maxlength: 20,
     unique: true,
-    sparse: true,
-    index: true
+    sparse: true
+    // Removed index: true as unique implies an index
   })
   code?: string;
 
   @Prop({
     required: true,
     type: String,
-    enum: Object.values(MasterType),
-    index: true
+    enum: Object.values(MasterType)
+    // Removed index: true as it should be defined in schema.index()
   })
   masterType: MasterType;
 
@@ -49,31 +49,31 @@ export class BaseMaster {
     required: true,
     type: String,
     enum: Object.values(MasterStatus),
-    default: MasterStatus.ACTIVE,
-    index: true
+    default: MasterStatus.ACTIVE
+    // Removed index: true as it should be defined in schema.index()
   })
   status: MasterStatus;
 
-  @Prop({ 
-    required: false, 
-    min: 0, 
+  @Prop({
+    required: false,
+    min: 0,
     max: 9999,
-    default: 0,
-    index: true 
+    default: 0
+    // Removed index: true as it should be defined in schema.index()
   })
   sortOrder?: number;
 
-  @Prop({ 
-    required: false, 
-    default: false,
-    index: true 
+  @Prop({
+    required: false,
+    default: false
+    // Removed index: true as it should be defined in schema.index()
   })
   isDefault?: boolean;
 
-  @Prop({ 
-    required: false, 
-    default: false,
-    index: true 
+  @Prop({
+    required: false,
+    default: false
+    // Removed index: true as it should be defined in schema.index()
   })
   isPopular?: boolean;
 
@@ -100,11 +100,11 @@ export type BaseMasterDocument = BaseMaster & Document;
  */
 @Schema({ _id: false })
 export class MasterWithParent extends BaseMaster {
-  @Prop({ 
-    required: false, 
+  @Prop({
+    required: false,
     type: Types.ObjectId,
-    ref: 'BaseMaster',
-    index: true 
+    ref: 'BaseMaster'
+    // Removed index: true as it should be defined in schema.index()
   })
   parentId?: Types.ObjectId;
 
@@ -122,11 +122,11 @@ export class MasterWithParent extends BaseMaster {
  */
 @Schema({ _id: false })
 export class MasterWithCategory extends BaseMaster {
-  @Prop({ 
-    required: false, 
-    trim: true, 
-    maxlength: 50,
-    index: true 
+  @Prop({
+    required: false,
+    trim: true,
+    maxlength: 50
+    // Removed index: true as it should be defined in schema.index()
   })
   category?: string;
 
@@ -151,9 +151,9 @@ export class MasterWithCategory extends BaseMaster {
  */
 @Schema({ _id: false })
 export class MasterWithNumericValue extends BaseMaster {
-  @Prop({ 
-    required: false, 
-    index: true 
+  @Prop({
+    required: false
+    // Removed index: true as it should be defined in schema.index()
   })
   numericValue?: number;
 
@@ -181,27 +181,27 @@ export class MasterWithNumericValue extends BaseMaster {
  */
 @Schema({ _id: false })
 export class MasterWithLocation extends BaseMaster {
-  @Prop({ 
-    required: false, 
-    trim: true, 
-    maxlength: 100,
-    index: true 
+  @Prop({
+    required: false,
+    trim: true,
+    maxlength: 100
+    // Removed index: true as it should be defined in schema.index()
   })
   state?: string;
 
-  @Prop({ 
-    required: false, 
-    trim: true, 
-    maxlength: 100,
-    index: true 
+  @Prop({
+    required: false,
+    trim: true,
+    maxlength: 100
+    // Removed index: true as it should be defined in schema.index()
   })
   country?: string;
 
-  @Prop({ 
-    required: false, 
-    type: [Number], 
-    validate: [arrayLimit, 'Coordinates must have exactly 2 elements'],
-    index: '2dsphere' 
+  @Prop({
+    required: false,
+    type: [Number],
+    validate: [arrayLimit, 'Coordinates must have exactly 2 elements']
+    // Removed index: '2dsphere' as it should be defined in schema.index()
   })
   coordinates?: [number, number]; // [longitude, latitude]
 
@@ -236,11 +236,11 @@ function arrayLimit(val: number[]) {
 })
 export class CombinedMaster extends BaseMaster {
   // Parent relationship fields
-  @Prop({ 
-    required: false, 
+  @Prop({
+    required: false,
     type: Types.ObjectId,
-    ref: 'CombinedMaster',
-    index: true 
+    ref: 'CombinedMaster'
+    // Removed index: true as it should be defined in schema.index()
   })
   parentId?: Types.ObjectId;
 
@@ -252,11 +252,11 @@ export class CombinedMaster extends BaseMaster {
   parentType?: MasterType;
 
   // Category fields
-  @Prop({ 
-    required: false, 
-    trim: true, 
-    maxlength: 50,
-    index: true 
+  @Prop({
+    required: false,
+    trim: true,
+    maxlength: 50
+    // Removed index: true as it should be defined in schema.index()
   })
   category?: string;
 
@@ -275,9 +275,9 @@ export class CombinedMaster extends BaseMaster {
   color?: string;
 
   // Numeric value fields
-  @Prop({ 
-    required: false, 
-    index: true 
+  @Prop({
+    required: false
+    // Removed index: true as it should be defined in schema.index()
   })
   numericValue?: number;
 
@@ -299,27 +299,27 @@ export class CombinedMaster extends BaseMaster {
   maxValue?: number;
 
   // Location fields
-  @Prop({ 
-    required: false, 
-    trim: true, 
-    maxlength: 100,
-    index: true 
+  @Prop({
+    required: false,
+    trim: true,
+    maxlength: 100
+    // Removed index: true as it should be defined in schema.index()
   })
   state?: string;
 
-  @Prop({ 
-    required: false, 
-    trim: true, 
-    maxlength: 100,
-    index: true 
+  @Prop({
+    required: false,
+    trim: true,
+    maxlength: 100
+    // Removed index: true as it should be defined in schema.index()
   })
   country?: string;
 
-  @Prop({ 
-    required: false, 
-    type: [Number], 
-    validate: [arrayLimit, 'Coordinates must have exactly 2 elements'],
-    index: '2dsphere' 
+  @Prop({
+    required: false,
+    type: [Number],
+    validate: [arrayLimit, 'Coordinates must have exactly 2 elements']
+    // Removed index: '2dsphere' as it should be defined in schema.index()
   })
   coordinates?: [number, number];
 
